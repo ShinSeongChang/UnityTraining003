@@ -69,6 +69,9 @@ public class PlayerControler : MonoBehaviour
         playerRigid.velocity = Vector2.zero;    // 플레이어는 죽으면 제자리에서 속도를 잃게된다.
 
         isDead = true;                  // isDead를 true로 만들어 각 함수에서 작용하게 한다.
+
+        GameManager.Instance.OnPlayerDead();
+
     }
 
     private void OnTriggerEnter2D(Collider2D other) //  무언가의 트리거에 닿는 순간
