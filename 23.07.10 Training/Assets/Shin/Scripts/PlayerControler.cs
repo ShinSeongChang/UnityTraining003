@@ -40,11 +40,15 @@ public class PlayerControler : MonoBehaviour
         {
             // 점프카운트 증가
             jumpCount++;
-            
-            playerRigid.velocity = Vector2.zero;    // 점프하는 순간 플레이어의 속도는 0
-            playerRigid.AddForce(new Vector2 (0, jumpForce));   // 2D 니까 Vector2 사용(x,y축), y축에 점프포스만큼 힘을 줘서 점프구현
 
-            playerAudio.Play();     // 오디오 소스 재생
+            // 점프하는 순간 플레이어의 속도는 0
+            playerRigid.velocity = Vector2.zero;
+
+            // 2D 니까 Vector2 사용(x,y축), y축에 점프포스만큼 힘을 줘서 점프구현
+            playerRigid.AddForce(new Vector2 (0, jumpForce));
+
+            // 오디오 소스 재생
+            playerAudio.Play();     
 
         }
 
@@ -62,39 +66,56 @@ public class PlayerControler : MonoBehaviour
     {
         // 애니메이터.데이터 타입 (여기에서는 Trigger 형태) ( "키값" == "Die" 파라미터 )
         animator.SetTrigger("Die");
-        
-        playerAudio.clip = deathClip;   //  플레이어 오디오 소스 클립을 교체 ( death클립으로 )
-        playerAudio.Play();             //  교체한 오디오소스를 다시 플레이 ( 죽었을때 오디오로 전환 )
 
-        playerRigid.velocity = Vector2.zero;    // 플레이어는 죽으면 제자리에서 속도를 잃게된다.
+        //  플레이어 오디오 소스 클립을 교체 ( death클립으로 )
+        playerAudio.clip = deathClip;
 
-        isDead = true;                  // isDead를 true로 만들어 각 함수에서 작용하게 한다.
+        //  교체한 오디오소스를 다시 플레이 ( 죽었을때 오디오로 전환 )
+        playerAudio.Play();
 
+        // 플레이어는 죽으면 제자리에서 속도를 잃게된다.
+        playerRigid.velocity = Vector2.zero;
+
+        // isDead를 true로 만들어 각 함수에서 작용하게 한다.
+        isDead = true;                  
+
+        // 게임매니저의 플레이어 죽음 상태 메서드 호출
         GameManager.Instance.OnPlayerDead();
 
     }
 
-    private void OnTriggerEnter2D(Collider2D other) //  무언가의 트리거에 닿는 순간
+
+    //  무언가의 트리거에 닿는 순간
+    private void OnTriggerEnter2D(Collider2D other) 
     {
-        
-        if (other.tag == "Dead" && !isDead)     //  해당 트리거 물체의 태그가 "Dead" 이면서 현재 상태가 !isDead라면 ( true 라면 ==> 초깃값은 false )
+        //  해당 트리거 물체의 태그가 "Dead" 이면서 현재 상태가 !isDead라면 ( true 라면 ==> 초깃값은 false )
+        if (other.tag == "Dead" && !isDead)     
         {
-            Die();      //  Die 함수를 실행한다. ( 플레이어는 Die 애니메이션을 보여주며 제자리에서 속도를 잃게 된다 )
+            //  Die 함수를 실행한다. ( 플레이어는 Die 애니메이션을 보여주며 제자리에서 속도를 잃게 된다 )
+            Die();      
         }
 
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)   // 무언가의 콜라이더에 닿는 순간 ( 땅에 닿아 있는 순간 )
-    {        
-        if (collision.contacts[0].normal.y > 0.7f)      //  충돌 방향이 왼쪽 혹은 오른쪽이라면 ( 절벽에 부딪힌 상황 제외 )
-        {                                               //  y값이 1에 가까울수록 완만한 경사, 1이라면 위쪽 방향, -1 이라면 아랫방향
-            isGrounded = true;      //  땅이라고 판정 ( 런 애니메이션 구현 )
-            jumpCount = 0;          //  점프 카운트를 초기화 시켜준다.
-        }
-    }
-
-    public void OnCollisionExit2D(Collision2D collision)    // 무언가의 콜라이더에서 벗어나는 순간 ( 땅에서 벗어나는 순간 )
+    // 무언가의 콜라이더에 닿는 순간 ( 땅에 닿아 있는 순간 )
+    public void OnCollisionEnter2D(Collision2D collision)   
     {
-        isGrounded = false;     // 땅이 아니라고 판정 ( 점프 애니메이션 구현, 점프 카운트 등 )
+        //  충돌 방향이 왼쪽 혹은 오른쪽이라면 ( 절벽에 부딪힌 상황 제외 )
+        //  y값이 1에 가까울수록 완만한 경사, 1이라면 위쪽 방향, -1 이라면 아랫방향
+        if (collision.contacts[0].normal.y > 0.7f)      
+        {
+            //  땅이라고 판정 ( 런 애니메이션 구현 )
+            isGrounded = true;
+
+            //  점프 카운트를 초기화 시켜준다.
+            jumpCount = 0;          
+        }
+    }
+
+    // 무언가의 콜라이더에서 벗어나는 순간 ( 땅에서 벗어나는 순간 )
+    public void OnCollisionExit2D(Collision2D collision)    
+    {
+        // 땅이 아니라고 판정 ( 점프 애니메이션 구현, 점프 카운트 등 )
+        isGrounded = false;     
     }
 }
